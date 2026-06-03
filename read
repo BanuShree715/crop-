@@ -1,0 +1,36 @@
+from pathlib import Path
+
+import cv2
+import numpy as np
+
+
+def main() -> None:
+    image_path = Path(__file__).resolve().parent / "leaf.jpg"
+    image = cv2.imread(str(image_path))
+
+    if image is None:
+        print(f"Error: Image not found or unreadable at {image_path}")
+        return
+
+    # Convert image to HSV
+    hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+
+    # Define green color range
+    lower_green = np.array([35, 40, 40])
+    upper_green = np.array([90, 255, 255])
+
+    # Detect green color
+    mask = cv2.inRange(hsv, lower_green, upper_green)
+
+    # Calculate health percentage based on green pixel ratio
+    green_pixels = np.count_nonzero(mask)
+    total_pixels = mask.size
+    health_percentage = (green_pixels / total_pixels) * 100
+
+    # Print to terminal
+    print(f"Health Percentage: {health_percentage:.2f}%")
+    print("Healthy Crop" if health_percentage > 50 else "Unhealthy Crop")
+
+
+if __name__ == "__main__":
+    main()
